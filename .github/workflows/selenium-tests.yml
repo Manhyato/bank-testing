@@ -1,0 +1,46 @@
+name: Run Selenium Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  selenium-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install selenium pytest
+
+      - name: Install Chrome and chromedriver
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser chromium-chromedriver
+          sudo ln -sf /usr/bin/chromium-browser /usr/bin/google-chrome
+          sudo ln -sf /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver
+
+      - name: Start web server
+        run: python3 -m http.server 8000 &
+      
+      - name: Wait for web to be up
+        run: |
+          for i in {1..20}; do
+            nc -zv 127.0.0.1 8000 && echo UP && break || echo -n .
+            sleep 1
+          done
+
+      - name: Run Selenium tests
+        env:
+          BANK_URL: http://localhost:8000/
+        run: pytest
