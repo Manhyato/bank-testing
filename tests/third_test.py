@@ -10,7 +10,12 @@ BASE_URL = "http://localhost:8000"
 
 @pytest.fixture(scope="module")
 def driver():
-    driver = webdriver.Chrome()
+    options = webdriver.ChromeOptions()
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    
+    driver = webdriver.Chrome(options=options)
     driver.implicitly_wait(2)
     yield driver
     driver.quit()
@@ -55,17 +60,15 @@ def test_successful_transfer(driver):
     click_rub_account(driver)
     enter_card_and_amount(driver, "1111 2222 3333 4444", 5000)
 
-    # Подождём alert с таймаутом 15 секунд
     try:
         alert = WebDriverWait(driver, 15).until(EC.alert_is_present())
     except TimeoutException:
         assert False, "Alert не появился в течение 15 секунд после перевода"
 
-    # Считаем, что alert появился — получаем текст и принимаем
     alert_text = alert.text.lower()
     alert.accept()
 
-    # Проверяем, что в тексте alert есть нужные слова
+
     assert "выполнен" in alert_text or "принят банком" in alert_text, \
         f"Ожидался успешный перевод, но получили: {alert_text}"
 
