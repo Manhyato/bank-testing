@@ -8,18 +8,6 @@ from selenium.common.exceptions import TimeoutException
 
 BASE_URL = "http://localhost:8000"
 
-@pytest.fixture(scope="module")
-def driver():
-    options = webdriver.ChromeOptions()
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-gpu")
-    
-    driver = webdriver.Chrome(options=options)
-    driver.implicitly_wait(2)
-    yield driver
-    driver.quit()
-
 def open_app(driver, url_params=""):
     driver.get(f"{BASE_URL}/?{url_params}")
 
@@ -67,7 +55,6 @@ def test_successful_transfer(driver):
 
     alert_text = alert.text.lower()
     alert.accept()
-
 
     assert "выполнен" in alert_text or "принят банком" in alert_text, \
         f"Ожидался успешный перевод, но получили: {alert_text}"
