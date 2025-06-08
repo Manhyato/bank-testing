@@ -6,13 +6,6 @@ import time
 
 URL = "http://localhost:8000/?balance=30000&reserved=20001"
 
-@pytest.fixture(scope="module")
-def driver():
-    driver = webdriver.Chrome()
-    driver.implicitly_wait(2)
-    yield driver
-    driver.quit()
-
 def open_app(driver, url=URL):
     driver.get(url)
     time.sleep(0.7)
