@@ -23,13 +23,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install selenium pytest
 
-      - name: Install Chrome and chromedriver
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y chromium-browser chromium-chromedriver
-          sudo ln -sf /usr/bin/chromium-browser /usr/bin/google-chrome
-          sudo ln -sf /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver
-
       - name: Start web server
         run: python3 -m http.server 8000 &
       
@@ -39,6 +32,12 @@ jobs:
             nc -zv 127.0.0.1 8000 && echo UP && break || echo -n .
             sleep 1
           done
+
+      - name: Install Google Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Install chromedriver
+        uses: nanasess/setup-chromedriver@v2
 
       - name: Run Selenium tests
         env:
