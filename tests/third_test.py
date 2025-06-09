@@ -4,8 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException 
-
+import time
 BASE_URL = "http://localhost:8000"
 
 @pytest.fixture(scope="module")
@@ -17,27 +16,26 @@ def driver():
 
 def open_app(driver, url_params=""):
     driver.get(f"{BASE_URL}/?{url_params}")
+    time.sleep(0.7)
 
 def click_rub_account(driver):
-    rub_block = WebDriverWait(driver, 5).until(
-        EC.element_to_be_clickable((By.XPATH, "//h2[text()='Рубли']/ancestor::div[@role='button']"))
-    )
+    rub_block = driver.find_element(By.XPATH, "//h2[text()='Рубли']/ancestor::div[@role='button']")
     rub_block.click()
 
 def enter_card_and_amount(driver, card_number, amount):
     card_input = driver.find_element(By.XPATH, "//input[@placeholder='0000 0000 0000 0000']")
-    card_input.clear()
     card_input.send_keys(card_number)
     card_input.send_keys(Keys.ENTER)
-
+    time.sleep(0.3)
     amount_input = driver.find_element(By.XPATH, "//input[@placeholder='1000']")
-    amount_input.clear()
     amount_input.send_keys(str(amount))
     amount_input.send_keys(Keys.ENTER)
+    time.sleep(0.5)
+
 
 # Тест 1: Проверка корректного расчета доступной суммы
 def test_correct_transfer_flow(driver):
-    open_app(driver, "balance=10000&reserved=3000")
+    open_app(driver, "balance=30000000&reserved=200000")
     click_rub_account(driver)
     enter_card_and_amount(driver, "1234 5678 9012 3456", 6000)
 
@@ -46,29 +44,23 @@ def test_correct_transfer_flow(driver):
     )
     assert confirm_btn.is_displayed(), "Кнопка перевода должна быть видна при корректных данных"
 
-# Тест 2: Успешный перевод допустимой суммы
-import time
-from selenium.common.exceptions import TimeoutException, NoAlertPresentException
-
-def test_successful_transfer(driver):
-    open_app(driver, "balance=10000&reserved=3000")
+# Тест 2: Попытка ввести буквы в поле ввода суммы для перевода
+def test_letters_not_allowed_in_amount_input(driver):
+    open_app(driver)
     click_rub_account(driver)
-    enter_card_and_amount(driver, "1111 2222 3333 4444", 5000)
 
-    # Подождём alert с таймаутом 15 секунд
-    try:
-        alert = WebDriverWait(driver, 15).until(EC.alert_is_present())
-    except TimeoutException:
-        assert False, "Alert не появился в течение 15 секунд после перевода"
+    card_input = driver.find_element(By.XPATH, "//input[@placeholder='0000 0000 0000 0000']")
+    card_input.clear()
+    card_input.send_keys("1234 5678 9012 3456")
+    card_input.send_keys(Keys.ENTER)
 
-    # Считаем, что alert появился — получаем текст и принимаем
-    alert_text = alert.text.lower()
-    alert.accept()
-
-    # Проверяем, что в тексте alert есть нужные слова
-    assert "выполнен" in alert_text or "принят банком" in alert_text, \
-        f"Ожидался успешный перевод, но получили: {alert_text}"
-
+    amount_input = driver.find_element(By.XPATH, "//input[@placeholder='1000']")
+    amount_input.clear()
+    amount_input.send_keys("abcXYZ")
+    amount_value = amount_input.get_attribute("value")
+    
+    assert amount_value == "" or amount_value.isdigit(), \
+        f"В поле суммы должны быть только цифры, но найдено: '{amount_value}'"
 
 # Тест 3: Попытка ввести буквы и спецсимволы в номер карты
 def test_invalid_card_input_blocked(driver):

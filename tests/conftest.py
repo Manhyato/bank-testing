@@ -4,8 +4,7 @@ from selenium.webdriver.chrome.options import Options
 
 @pytest.fixture(scope="module")
 def driver():
-    options = Options()
-    options.add_argument("--headless")       
+    options = Options()    
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
@@ -13,3 +12,4 @@ def driver():
     driver.implicitly_wait(2)
     yield driver
     driver.quit()
+
