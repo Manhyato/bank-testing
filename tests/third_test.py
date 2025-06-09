@@ -7,13 +7,6 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 BASE_URL = "http://localhost:8000"
 
-@pytest.fixture(scope="module")
-def driver():
-    driver = webdriver.Chrome()
-    driver.implicitly_wait(2)
-    yield driver
-    driver.quit()
-
 def open_app(driver, url_params=""):
     driver.get(f"{BASE_URL}/?{url_params}")
     time.sleep(0.7)
