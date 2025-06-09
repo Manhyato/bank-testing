@@ -23,7 +23,7 @@ def clear_input_field(element):
     element.send_keys(Keys.BACK_SPACE)
 
 
-@pytest.mark.xfail(reason="BUG-001: Комиссия для сумм < 100 некорректно рассчитывается как 0")
+@pytest.mark.xfail(reason="https://github.com/Manhyato/bank-testing/issues/5")
 def test_incorrect_commission_fail(driver):
     driver.get(BASE_URL)
     driver.find_element(*RUB_ACCOUNT_SELECTOR).click()
@@ -44,7 +44,7 @@ def test_card_input_only_digits_pass(driver):
     card_input.send_keys("1234abcd5678!@#$")
     assert card_input.get_attribute("value") == "1234 5678"
 
-@pytest.mark.xfail(reason="BUG-002: Приложение позволяет переводить отрицательные суммы")
+@pytest.mark.xfail(reason="https://github.com/Manhyato/bank-testing/issues/6")
 def test_negative_amount_transfer_fail(driver):
     """Тест 3: Проверка реакции на ввод отрицательной суммы."""
     driver.get(BASE_URL)
@@ -75,7 +75,7 @@ def test_insufficient_funds_pass(driver):
     error_message = wait.until(EC.visibility_of_element_located(ERROR_MESSAGE_SELECTOR))
     assert error_message.is_displayed(), "Сообщение о недостатке средств не отобразилось"
 
-@pytest.mark.xfail(reason="BUG-003: Отрицательный резерв увеличивает доступный баланс")
+@pytest.mark.xfail(reason="https://github.com/Manhyato/bank-testing/issues/7")
 def test_negative_reserved_value_fail(driver):
     """Тест 5: Проверка реакции на отрицательное значение в резерве."""
     driver.get("http://localhost:8000/?balance=10000&reserved=-1000")

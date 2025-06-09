@@ -26,6 +26,7 @@ def test_open_card_input(driver):
     card_input = driver.find_element(By.XPATH, "//input[@placeholder='0000 0000 0000 0000']")
     assert card_input.is_displayed()
 
+@pytest.mark.xfail(reason="https://github.com/Manhyato/bank-testing/issues/20")
 def test_card_number_length_validation(driver):
     """Тест 3: Проверка валидации длины номера карты (меньше и больше 16 цифр)"""
     open_app(driver)
@@ -45,7 +46,6 @@ def test_card_number_length_validation(driver):
     time.sleep(0.5)
     assert not driver.find_elements(By.XPATH, "//input[@placeholder='1000']"), "Поле суммы появилось при >16 цифрах"
 
-
 def test_exceeding_transfer_amount(driver):
     """Тест 4: Проверка превышения доступной суммы перевода"""
     open_app(driver)
@@ -61,6 +61,7 @@ def test_exceeding_transfer_amount(driver):
     time.sleep(0.5)
     assert driver.find_element(By.XPATH, "//*[contains(text(), 'Недостаточно средств')]").is_displayed()
 
+@pytest.mark.xfail(reason="https://github.com/Manhyato/bank-testing/issues/21")
 def test_negative_transfer_amount(driver):
     """Тест 5: Проверка обработки отрицательной суммы перевода"""
     open_app(driver)

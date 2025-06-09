@@ -67,6 +67,7 @@ def test_invalid_card_input_blocked(driver):
     assert entered.strip() == "", "Поле карты не должно принимать буквы или спецсимволы"
 
 # Тест 4: Ввод текста в поле balance — ожидаемый баг
+@pytest.mark.xfail(reason="https://github.com/Manhyato/bank-testing/issues/2")
 def test_invalid_balance_input(driver):
     open_app(driver, "balance=dsfs&reserved=1000")
     rub_sum_text = driver.find_element(By.ID, "rub-sum").text
@@ -75,6 +76,7 @@ def test_invalid_balance_input(driver):
     pytest.fail("BUG: Нет валидации для текстового значения balance")
 
 # Тест 5: Ввод текста в поле reserved — ожидаемый баг
+@pytest.mark.xfail(reason="https://github.com/Manhyato/bank-testing/issues/3")
 def test_invalid_reserved_input(driver):
     open_app(driver, "balance=1000&reserved=fdfd")
     reserved_text = driver.find_element(By.ID, "rub-reserved").text

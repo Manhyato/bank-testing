@@ -78,7 +78,7 @@ def test_zero_balance_pass(driver):
     assert len(buttons) == 0, "Кнопка 'Перевести' не должна отображаться"
 
 
-@pytest.mark.xfail(reason="BUG-002: Приложение удаляет точку в дробных числах")
+@pytest.mark.xfail(reason="https://github.com/Manhyato/bank-testing/issues/17")
 def test_decimal_amount_fail(driver):
     """Тест 4: Проверяет, что приложение удаляет точку из суммы, превращая 150.50 в 15050."""
     driver.get(f"{BASE_URL}?balance=20000.75&reserved=0")
@@ -95,7 +95,7 @@ def test_decimal_amount_fail(driver):
     assert amount_input.get_attribute("value") == "15050"
 
 
-@pytest.mark.xfail(reason="BUG-003: Потеря точности при обработке больших чисел")
+@pytest.mark.xfail(reason="https://github.com/Manhyato/bank-testing/issues/18")
 def test_large_number_precision_fail(driver):
     """Тест 5: Проверяет, что баланс, превышающий MAX_SAFE_INTEGER, отображается неверно."""
     large_balance = "9007199254740993"
